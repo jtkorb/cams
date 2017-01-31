@@ -108,6 +108,7 @@ mail.settings.ssl = myconf.get('smtp.ssl') or False
 auth.settings.registration_requires_verification = False
 auth.settings.registration_requires_approval = False
 auth.settings.reset_password_requires_verification = True
+auth.settings.actions_disabled = ['register']
 
 # -------------------------------------------------------------------------
 # Define your tables below (or better in another model file) for example
@@ -130,3 +131,5 @@ auth.settings.reset_password_requires_verification = True
 # after defining tables, uncomment below to enable auditing
 # -------------------------------------------------------------------------
 # auth.enable_record_versioning(db)
+
+db.define_table('images', Field('name'), Field('image', 'upload'))

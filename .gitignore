@@ -4,3 +4,5 @@ errors/
 private/appconfig.ini
 .pythonhistory
 *.pyc
+.idea/
+uploads/

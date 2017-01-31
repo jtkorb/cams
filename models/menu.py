@@ -5,11 +5,9 @@
 # Customize your APP title, subtitle and menus here
 # ----------------------------------------------------------------------------------------------------------------------
 
-response.logo = A(B('web', SPAN(2), 'py'), XML('&trade;&nbsp;'),
-                  _class="navbar-brand", _href="http://www.web2py.com/",
-                  _id="web2py-logo")
-response.title = request.application.replace('_', ' ').title()
-response.subtitle = ''
+response.logo = DIV(B('Home Cameras'), _class="navbar-brand", _id="web2py-logo")
+response.title = request.application.replace('_', ' ').lower()
+response.subtitle = 'look on'
 
 # ----------------------------------------------------------------------------------------------------------------------
 # read more at http://dev.w3.org/html5/markup/meta.name.html
@@ -32,7 +30,7 @@ response.menu = [
     (T('Home'), False, URL('default', 'index'), [])
 ]
 
-DEVELOPMENT_MENU = True
+DEVELOPMENT_MENU = False
 
 
 # ----------------------------------------------------------------------------------------------------------------------
