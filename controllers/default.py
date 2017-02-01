@@ -7,42 +7,74 @@ if False:
     from applications.eve.controllers.db import *
     from applications.eve.controllers.db import auth
     from applications.eve.controllers.db import myconf
+    from applications.eve.controllers.db import service
     db = current.db
     response = current.response
     request = current.request
     cache = current.cache
     T = current.T
 
+
 @auth.requires_login()
 def index():
     """
+    Determine camera names and launch ajax to start the snap.
     """
+    names = myconf.get('app.names').split()
+
+    targets = DIV()
+    loaders = ""
+    for name in names:
+        target_id = "target_%s" % name
+        targets.append(DIV(IMG(_src=URL('static', 'images/spinner.gif')), _id=target_id,
+                           _style="width:450px;height:300px;display:inline-block;"))
+        loaders += "ajax('%s', ['name'], '%s');" % (URL('get_snap', args=[name]), target_id)
+    script = SCRIPT("jQuery(document).ready(function(){" + loaders + "});")
+
+    return dict(content=DIV(targets, script))
+
+
+@auth.requires_login()
+def get_snap():
+    import time
+
+    name = request.args[0]
+
     login = myconf.get('app.login')
     password = myconf.get('app.password')
     host = myconf.get('app.host')
-
     names = myconf.get('app.names').split()
     ports = myconf.get('app.ports').split()
 
-    row_list = []
-    for i in range(len(ports)):
-        port = ports[i]
-        name = names[i]
-        url = "http://%s:%s/cgi-bin/CGIProxy.fcgi?cmd=snapPicture2&usr=%s&pwd=%s" % (host, port, login, password)
-        r = requests.get(url, stream=True)
-        row_list.append(db.images.insert(name=name, image=db.images.image.store(r.raw, name + ".jpg")))
+    port = None
+    for i in range(len(names)):
+        if names[i] == name:
+            port = ports[i]
+            break
+    assert port is not None
 
-    content = DIV()
+    camera_url = "http://%s:%s/cgi-bin/CGIProxy.fcgi?cmd=snapPicture2&usr=%s&pwd=%s" % (host, port, login, password)
+
+    t1 = time.time()
+    r = requests.get(camera_url, stream=True)
+    image_id = db.images.insert(name=name, image=db.images.image.store(r.raw, name + ".jpg"))
+    t2 = time.time()
+
     rows = db(db.images).select()
-    rows = rows.find(lambda row: row.id in row_list)
-    for row in rows:
-        content.append(A(IMG(_src=URL('download', args=row.image), _width=400), _href=URL('fullsize', args=row.image), _target="_blank"))
-        content.append(" ")
+    row = rows.find(lambda row: row.id == image_id).first()
 
-    return dict(content=content)
+    anchor = A(IMG(_src=URL('download', args=row.image), _width=400, _style="box-shadow: 8px 8px 10px #aaa"),
+               _href=URL('fullsize', args=row.image), _target="_blank")
 
+    return DIV(DIV(anchor, _style="margin-bottom:10px"),
+               DIV("Time to snap: %.2f seconds" % (t2-t1)),
+               _style="display:inline-block;margin-right:20px;margin-bottom:50px")
+
+
+@auth.requires_login()
 def fullsize():
     return IMG(_src=URL('download', args=request.args))
+
 
 def user():
     """
@@ -81,5 +113,3 @@ def call():
     supports xml, json, xmlrpc, jsonrpc, amfrpc, rss, csv
     """
     return service()
-
-
