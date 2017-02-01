@@ -27,7 +27,7 @@ def index():
     for name in names:
         target_id = "target_%s" % name
         targets.append(DIV(IMG(_src=URL('static', 'images/spinner.gif')), _id=target_id,
-                           _style="width:450px;height:300px;display:inline-block;"))
+                           _style="width:300px;display:inline-block;margin-right:20px;margin-bottom:50px;"))
         loaders += "ajax('%s', ['name'], '%s');" % (URL('get_snap', args=[name]), target_id)
     script = SCRIPT("jQuery(document).ready(function(){" + loaders + "});")
 
@@ -63,12 +63,11 @@ def get_snap():
     rows = db(db.images).select()
     row = rows.find(lambda row: row.id == image_id).first()
 
-    anchor = A(IMG(_src=URL('download', args=row.image), _width=400, _style="box-shadow: 8px 8px 10px #aaa"),
+    anchor = A(IMG(_src=URL('download', args=row.image), _width="300px", _style="box-shadow: 8px 8px 10px #aaa"),
                _href=URL('fullsize', args=row.image), _target="_blank")
 
     return DIV(DIV(anchor, _style="margin-bottom:10px"),
-               DIV("Time to snap: %.2f seconds" % (t2-t1)),
-               _style="display:inline-block;margin-right:20px;margin-bottom:50px")
+               DIV("Time to snap: %.2f seconds" % (t2-t1)))
 
 
 @auth.requires_login()
