@@ -1,0 +1,9 @@
+{{left_sidebar_enabled,right_sidebar_enabled=False,False}}
+{{extend 'layout.html'}}
+
+{{=content}}
+
+{{if request.is_local:}}
+<br /><br /><br />
+{{=response.toolbar()}}
+{{pass}}

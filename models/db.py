@@ -133,3 +133,13 @@ auth.settings.actions_disabled = ['register']
 # auth.enable_record_versioning(db)
 
 db.define_table('images', Field('name'), Field('image', 'upload'))
+
+db.define_table('groups', Field('name'))
+
+db.define_table('cameras',
+                Field('name'),
+                Field('group_id', 'reference groups'),
+                Field('host_name'),
+                Field('port'),
+                Field('usr'),
+                Field('pwd', 'password'))

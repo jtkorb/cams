@@ -64,7 +64,7 @@ def get_snap():
     row = rows.find(lambda row: row.id == image_id).first()
 
     anchor = A(IMG(_src=URL('download', args=row.image), _style="width:100%;max-width:600px;box-shadow: 8px 8px 10px #aaa"),
-               _href=URL('fullsize', args=row.image), _target="_blank")
+               _href=URL('fullsize', args=row.image))
 
     return DIV(DIV(anchor, _style="margin-bottom:10px"),
                DIV("Time to snap: %.2f seconds" % (t2-t1)))
@@ -72,7 +72,7 @@ def get_snap():
 
 @auth.requires_login()
 def fullsize():
-    return IMG(_src=URL('download', args=request.args))
+    return dict(content=IMG(_src=URL('download', args=request.args)))
 
 
 def user():
