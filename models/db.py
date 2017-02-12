@@ -31,7 +31,7 @@ if not request.env.web2py_runtime_gae:
     db = DAL(myconf.get('db.uri'),
              pool_size=myconf.get('db.pool_size'),
              migrate_enabled=myconf.get('db.migrate'),
-             check_reserved=['all'])
+             check_reserved=['sqlite', 'mysql'])
 else:
     # ---------------------------------------------------------------------
     # connect to Google BigTable (optional 'google:datastore://namespace')
@@ -132,14 +132,17 @@ auth.settings.actions_disabled = ['register']
 # -------------------------------------------------------------------------
 # auth.enable_record_versioning(db)
 
-db.define_table('images', Field('name'), Field('image', 'upload'))
-
-db.define_table('groups', Field('name'))
-
 db.define_table('cameras',
                 Field('name'),
-                Field('group_id', 'reference groups'),
-                Field('host_name'),
+                Field('batch'),
+                Field('fqdn'),
                 Field('port'),
                 Field('usr'),
-                Field('pwd', 'password'))
+                Field('pwd', 'password'),
+                singular='Camera',
+                plural='Cameras')
+
+db.define_table('images',
+                Field('camera_id', 'reference cameras'),
+                Field('time', 'datetime'),
+                Field('image', 'upload'))
